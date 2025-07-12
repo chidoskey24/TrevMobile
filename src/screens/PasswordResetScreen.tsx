@@ -3,11 +3,10 @@ import { View, StyleSheet } from 'react-native';
 import { Text, TextInput as RNTextInput, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/RootNavigator';
-
+import type { AuthStackParamList } from '../navigation/RootNavigator';
 export default function PasswordResetScreen() {
   const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
 
   const handleSend = () => {
     /* TODO: wire to backend → then maybe navigate back or show toast */

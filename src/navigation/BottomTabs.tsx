@@ -4,19 +4,20 @@ import { Image, TouchableOpacity, StyleSheet } from 'react-native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from './RootNavigator';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 import DashboardScreen from '../screens/DashboardScreen';
-import Dummy            from '../screens/Placeholder';
+import Dummy           from '../screens/Placeholder';    // still used for the hidden Scan tab
+import SettingsScreen  from '../screens/SettingsScreen'; // ✅ real settings
 import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabs() {
-
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <>
-      {/* ───────── bottom-bar ───────── */}
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
@@ -39,17 +40,17 @@ export default function BottomTabs() {
           }}
         />
 
-        {/* dummy Scan – we hide its button because we render our own FAB */}
+        {/* Scan – hidden, launch via FAB */}
         <Tab.Screen
           name="Scan"
           component={Dummy}
           options={{ tabBarButton: () => null }}
         />
 
-        {/* Settings */}
+        {/* Settings – ↩︎ was Dummy, now real screen */}
         <Tab.Screen
           name="Settings"
-          component={Dummy}
+          component={SettingsScreen}      
           options={{
             tabBarIcon: ({ color }) => (
               <Image
@@ -61,7 +62,7 @@ export default function BottomTabs() {
         />
       </Tab.Navigator>
 
-      {/* ───────── floating Scan FAB ───────── */}
+      {/* floating Scan FAB */}
       <TouchableOpacity
         activeOpacity={0.8}
         style={styles.fab}
@@ -83,8 +84,8 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 32,            // distance from device bottom-edge
-    alignSelf: 'center',   // ← guarantees perfect centring
+    bottom: 32,
+    alignSelf: 'center',
     width: 72,
     height: 72,
     borderRadius: 36,

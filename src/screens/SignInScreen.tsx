@@ -10,28 +10,32 @@ import {
 import { Text, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
-
+import type { AuthStackParamList } from '../navigation/RootNavigator';
+import { useAppStore } from '../store/useAppStore';
 // ────────────────────────────────────────────
 // Types & hooks
 // ────────────────────────────────────────────
-type Nav = NativeStackNavigationProp<RootStackParamList>;
+type Nav = NativeStackNavigationProp<AuthStackParamList>;
 
 export default function SignInScreen() {
   const navigation = useNavigation<Nav>();
-
+  const { setUser } = useAppStore();
   // ─────── Handlers (stub) ───────
   const handleNext = () => {
     /** TODO: validate email, maybe hit API, etc.               **/
     /** If everything is OK, forward user to the dashboard tab. **/
 
-    // 2️⃣  LANDING inside BottomTabs (“Dashboard” stack entry)
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Dashboard' }],   // MUST match the <Stack.Screen name="Dashboard" …/>
+    // // 2️⃣  LANDING inside BottomTabs (“Dashboard” stack entry)
+    // navigation.reset({
+    //   index: 0,
+    //   routes: [{ name: 'Dashboard' }],   // MUST match the <Stack.Screen name="Dashboard" …/>
+    // });
+    setUser({
+      id: '1',
+      name: 'John Doe',
+      email: 'john.doe@example.com',
     });
   };
-  const handleGoogleLogin = () => console.log('TODO: Google OAuth');
 
   // Nav helpers
   const goToSignUp      = () => navigation.navigate('SignUp');
@@ -66,23 +70,6 @@ export default function SignInScreen() {
       >
         Next
       </Button>
-
-      {/* OR divider */}
-      <View style={styles.dividerRow}>
-        <View style={styles.line} />
-        <Text style={styles.or}>or</Text>
-        <View style={styles.line} />
-      </View>
-
-      {/* Google only */}
-      <TouchableOpacity style={styles.oauthBtn} onPress={handleGoogleLogin}>
-        <Image
-          source={require('../../assets/icons/google.png')}
-          style={styles.icon}
-          resizeMode="contain"
-        />
-        <Text style={styles.oauthText}>Continue with Google</Text>
-      </TouchableOpacity>
 
       {/* Bottom link */}
       <TouchableOpacity style={styles.bottomWrap} onPress={goToSignUp}>
@@ -140,34 +127,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: 0.5,
     color: '#fff',
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 28,
-  },
-  line: { flex: 1, height: 1, backgroundColor: '#ddd' },
-  or:   { marginHorizontal: 8, color: '#666', fontSize: 13 },
-  oauthBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 25,
-    height: 50,
-    paddingHorizontal: 16,
-    alignSelf: 'center',
-    width: '60%',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    marginRight: 10,
-  },
-  oauthText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#000',
   },
   bottomWrap: {
     marginTop: 'auto',

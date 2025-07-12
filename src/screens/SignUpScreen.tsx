@@ -9,12 +9,11 @@ import {
 } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import type { AuthStackParamList } from '../navigation/RootNavigator';
 
 export default function SignUpScreen() {
   // stub handlers – replace later
   const handleCreate = () => console.log('TODO: create account');
-  const handleGoogle = () => console.log('TODO: Google OAuth');
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -39,22 +38,6 @@ export default function SignUpScreen() {
         Create Account
       </Button>
 
-      {/* OR divider */}
-      <View style={styles.dividerRow}>
-        <View style={styles.line} />
-        <Text style={styles.or}>or</Text>
-        <View style={styles.line} />
-      </View>
-
-      {/* Google OAuth only */}
-      <TouchableOpacity style={styles.oauthBtn} onPress={handleGoogle}>
-        <Image
-          source={require('../../assets/icons/google.png')}
-          style={styles.icon}
-          resizeMode="contain"
-        />
-        <Text style={styles.oauthText}>Continue with Google</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -99,30 +82,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: 0.5,
     color: '#fff',
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 28,
-  },
-  line: { flex: 1, height: 1, backgroundColor: '#ddd' },
-  or:   { marginHorizontal: 8, color: '#666', fontSize: 13 },
-  oauthBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 25,
-    height: 50,
-    paddingHorizontal: 16,
-    textAlign: 'center',
-    marginTop: 16,
-    alignSelf: 'center',  // center horizontally
-    width: '60%',  // full width like Sign-In
-  },
-  oauthText: {
-    fontSize: 15,
-    fontWeight: '600',              // bold – matches spec
-    color: '#000',
   },
 });

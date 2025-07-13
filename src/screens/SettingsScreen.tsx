@@ -1,67 +1,107 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Divider, List } from 'react-native-paper';
+//  src/screens/SettingsScreen.tsx
+import React, { useState } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import { Text, IconButton } from 'react-native-paper';
+
 import { useAppStore } from '../store/useAppStore';
-import { useWallet } from '../hooks/useWallet';
-import { useNavigation } from '@react-navigation/native';
+import { useWallet }   from '../hooks/useWallet';
 
+/* ──────────────────────────────────────────
+   Screen
+   ─────────────────────────────────────── */
 export default function SettingsScreen() {
-  const navigation = useNavigation();
-  const user     = useAppStore((s) => s.user);
-  const reset    = useAppStore((s) => s.resetUser);
-  const { connect, disconnect, connector } = useWallet();
+  /* Zustand */
+  const user            = useAppStore(s => s.user);
+  const resetUser       = useAppStore(s => s.resetUser);
 
-  const handleLogout = () => {
-    reset();
-    // optional: navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
+  /* WalletConnect */
+  const { connect, disconnect, connector } = useWallet();
+  const [busy, setBusy]  = useState(false);
+
+  const handleWalletPress = async () => {
+    try {
+      setBusy(true);
+      if (connector.connected) {
+        await disconnect();
+      } else {
+        await connect();
+      }
+    } finally {
+      setBusy(false);
+    }
   };
+
+  const handleLogout = () => resetUser();
+
+  /* Derived state */
+  const connected = Boolean(user?.walletAddress);
 
   return (
     <View style={styles.container}>
-      <List.Section>
-        <List.Subheader style={styles.subheader}>Account</List.Subheader>
+      {/* Header */}
+      <Text style={styles.header}>Account</Text>
 
-        <List.Item
-          title="Profile"
-          description="Add your name & email"
-          left={(props) => <List.Icon {...props} icon="account" />}
-          onPress={() => navigation.navigate('Profile' as never)}
-        />
+      {/* Profile row — just a stub for now */}
+      <TouchableOpacity style={styles.row}>
+        <IconButton icon="account" size={20} />
+        <View>
+          <Text style={styles.rowTitle}>Profile</Text>
+          <Text style={styles.rowSub}>Add your name &amp; email</Text>
+        </View>
+      </TouchableOpacity>
 
-        {/* ——— Move “Connect wallet” here later ——— */}
-        <List.Item
-          title="Link wallet"
-          description="MetaMask, Rainbow …"
-          left={(props) => <List.Icon {...props} icon="wallet" />}
-          onPress={() => navigation.navigate('LinkWallet' as never)}
-        />
-      </List.Section>
+      {/* Wallet row */}
+      <TouchableOpacity style={styles.row} onPress={handleWalletPress}>
+        <IconButton icon="qrcode-scan" size={20} />
+        <View>
+          <Text style={styles.rowTitle}>
+            {connected ? 'Disconnect wallet' : 'Link wallet'}
+          </Text>
+          <Text style={styles.rowSub}>
+            {connected
+              ? user!.walletAddress!.slice(0, 6) + '…' + user!.walletAddress!.slice(-4)
+              : 'MetaMask, Rainbow …'}
+          </Text>
+        </View>
 
-      <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-        <Text style={styles.logoutTxt}>Log out</Text>
+        {busy && <ActivityIndicator style={{ marginLeft: 'auto' }} />}
+      </TouchableOpacity>
+
+      {/* Log-out button */}
+      <TouchableOpacity style={styles.logout} onPress={handleLogout}>
+        <Text style={styles.logoutLabel}>Log out</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
+/* ──────────────────────────────────────────
+   Styles
+   ─────────────────────────────────────── */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  logoutBtn: {
-    marginHorizontal: 24,
-    marginTop: 'auto',
-    marginBottom: 48,
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 28,
+  container: { flex: 1, backgroundColor: '#fff', padding: 24 },
+  header:    { fontSize: 18, fontWeight: '700', marginBottom: 12 },
+
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
   },
-  logoutTxt: { color: '#d00', fontWeight: '700', fontSize: 16 },
-  subheader: {
-    marginTop: 24,
-    marginBottom: 12,
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#000',
+  rowTitle: { fontSize: 15, fontWeight: '600', color: '#000' },
+  rowSub:   { fontSize: 12, color: '#666' },
+
+  logout: {
+    marginTop: 'auto',
+    borderWidth: 1,
+    borderColor: '#d33',
+    borderRadius: 28,
+    paddingVertical: 14,
+    alignItems: 'center',
   },
+  logoutLabel: { color: '#d33', fontWeight: '700', fontSize: 15 },
 });

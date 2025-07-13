@@ -1,77 +1,97 @@
-import React from 'react';
+//  src/screens/SignInScreen.tsx
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
   TextInput as RNTextInput,
-  Image,
 } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { AuthStackParamList } from '../navigation/RootNavigator';
+import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useAppStore } from '../store/useAppStore';
-// ────────────────────────────────────────────
-// Types & hooks
-// ────────────────────────────────────────────
-type Nav = NativeStackNavigationProp<AuthStackParamList>;
+
+/* ------------------------------------------------------------------ */
+/* Types & hooks                                                      */
+/* ------------------------------------------------------------------ */
+type Nav = NativeStackNavigationProp<RootStackParamList, 'SignIn'>;
 
 export default function SignInScreen() {
   const navigation = useNavigation<Nav>();
-  const { setUser } = useAppStore();
-  // ─────── Handlers (stub) ───────
-  const handleNext = () => {
-    /** TODO: validate email, maybe hit API, etc.               **/
-    /** If everything is OK, forward user to the dashboard tab. **/
 
-    // // 2️⃣  LANDING inside BottomTabs (“Dashboard” stack entry)
-    // navigation.reset({
-    //   index: 0,
-    //   routes: [{ name: 'Dashboard' }],   // MUST match the <Stack.Screen name="Dashboard" …/>
-    // });
+  /* local input state ------------------------------------------------ */
+  const [email,    setEmail]    = useState('');
+  const [password, setPassword] = useState('');
+
+  /* store ------------------------------------------------------------ */
+  const setUser = useAppStore(s => s.setUser);
+
+  /* handlers --------------------------------------------------------- */
+  const handleNext = () => {
+    // TODO: validate credentials, call backend, etc.
+    // For now we persist a dummy user and land in the dashboard.
     setUser({
-      id: '1',
-      name: 'John Doe',
+      id:    '1',
+      name:  'John Doe',
       email: 'john.doe@example.com',
     });
+    navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
   };
 
-  // Nav helpers
-  const goToSignUp      = () => navigation.navigate('SignUp');
-  const goToReset       = () => navigation.navigate('PasswordReset');
+  const goToSignUp = () => navigation.navigate('SignUp');
+  const goToReset  = () => navigation.navigate('PasswordReset');
 
+  /* ------------------------------------------------------------------ */
   return (
-    <ScrollView contentContainerStyle={styles.container}>      
-      {/* ───────── Heading ───────── */}
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Sign In</Text>
       <Text style={styles.subtitle}>Login to get started</Text>
 
-      {/* ───────── Email field ───────── */}
+      {/* E-mail -------------------------------------------------------- */}
       <RNTextInput
         placeholder="Email"
         placeholderTextColor="#666"
         keyboardType="email-address"
+        autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
         style={styles.input}
       />
 
-      {/* Forgot password link */}
+      {/* Password ------------------------------------------------------ */}
+      <RNTextInput
+        placeholder="Password"
+        placeholderTextColor="#666"
+        secureTextEntry
+        autoCapitalize="none"
+        value={password}
+        onChangeText={setPassword}
+        style={[styles.input, { marginTop: 12 }]}
+      />
+
+      {/* Forgot password ---------------------------------------------- */}
       <TouchableOpacity onPress={goToReset} style={styles.forgotWrap}>
         <Text style={styles.forgot}>Forgot Password?</Text>
       </TouchableOpacity>
 
-      {/* Primary CTA */}
+      {/* CTA ----------------------------------------------------------- */}
       <Button
         mode="contained"
         contentStyle={{ height: 50 }}
-        style={styles.primaryBtn}
+        style={[
+          styles.primaryBtn,
+          (!email || !password) && { opacity: 0.4 },   // visual cue
+        ]}
         labelStyle={styles.primaryLabel}
         onPress={handleNext}
+        disabled={!email.trim() || !password.trim()}   // guard stays
       >
         Next
       </Button>
 
-      {/* Bottom link */}
+      {/* Footer link --------------------------------------------------- */}
       <TouchableOpacity style={styles.bottomWrap} onPress={goToSignUp}>
         <Text style={styles.bottomLink}>Create a TrevMobile Account</Text>
       </TouchableOpacity>
@@ -79,9 +99,9 @@ export default function SignInScreen() {
   );
 }
 
-// ────────────────────────────────────────────
-// Styles – mirrors SignUpScreen.tsx theme
-// ────────────────────────────────────────────
+/* ------------------------------------------------------------------ */
+/* Styles                                                              */
+/* ------------------------------------------------------------------ */
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
